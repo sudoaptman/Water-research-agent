@@ -7,16 +7,18 @@ def get_search_agent():
 
 def research_water_hardness(postcode):
     """
-    Searches for water hardness information.
+    Refined search query to target UK water quality report formats.
     """
     ddgs = get_search_agent()
-    query = f"water hardness in {postcode} UK ppm"
+    # Adding 'drinking water quality report' significantly improves hit rate
+    query = f"UK drinking water quality report hardness {postcode} site:gov.uk OR site:*.co.uk"
     
     try:
-        # Perform search and get the first result
-        results = list(ddgs.text(query, max_results=1))
+        results = list(ddgs.text(query, max_results=3))
         if results:
-            return results[0]['body']
-        return "No specific data found for this area."
+            # Join top 2 results to give the agent more context
+            extracted_info = "\n".join([r['body'] for r in results[:2]])
+            return extracted_info
+        return None
     except Exception as e:
         return f"Research error: {str(e)}"
