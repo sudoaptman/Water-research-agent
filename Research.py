@@ -3,28 +3,20 @@ from duckduckgo_search import DDGS
 
 @st.cache_resource
 def get_search_agent():
-    """
-    Initializes the search agent only once and caches it.
-    This prevents the agent from re-initializing on every script re-run.
-    """
     return DDGS()
 
-def get_water_profile(query):
+def research_water_hardness(postcode):
     """
-    Uses the cached search agent to perform a search.
+    Searches for water hardness information.
     """
     ddgs = get_search_agent()
+    query = f"water hardness in {postcode} UK ppm"
     
-    # Perform the search
-    # We use a context manager safely here
     try:
-        results = list(ddgs.text(query, max_results=3))
-        # Add your processing logic here
-        return results
+        # Perform search and get the first result
+        results = list(ddgs.text(query, max_results=1))
+        if results:
+            return results[0]['body']
+        return "No specific data found for this area."
     except Exception as e:
-        return f"Error performing search: {e}"
-
-# Example usage within this file if you were to run it directly:
-if __name__ == "__main__":
-    profile = get_water_profile("water hardness in Portsmouth")
-    print(profile)
+        return f"Research error: {str(e)}"
