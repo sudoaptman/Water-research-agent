@@ -1,0 +1,6 @@
+mysql-connector-python
+python-dotenv
+duckduckgo-search
+beautifulsoup4
+requests
+streamlit
