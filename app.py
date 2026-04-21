@@ -1,30 +1,35 @@
 import streamlit as st
-from Main import get_water_profile
+from Database import fetch_from_db, save_to_db
+from Research import research_water_hardness
 
-st.set_page_config(page_title="Water Quality Checker", page_icon="💧")
+# Set page configuration
+st.set_page_config(page_title="UK Water Quality Checker")
 
 st.title("💧 UK Water Quality Checker")
-st.write("Enter your postcode to see your local water profile and filter recommendations.")
 
-# Input field
-postcode = st.text_input("Enter your UK Postcode (e.g., PO1 1AA):", "")
+# FIX: Added a unique 'key' to prevent the DuplicateElementId error
+postcode = st.text_input(
+    "Enter your UK Postcode (e.g., PO1 1AA):", 
+    key="postcode_input"
+)
 
-if st.button("Check My Water"):
-    if postcode:
-        with st.spinner('Analyzing your local water profile...'):
-            data = get_water_profile(postcode)
-            
-            if data and "error" not in data:
-                st.success(f"Water Data Found for sector: {postcode[:3].upper()}")
-                st.metric("Hardness (PPM)", data['ppm_value'])
-                st.write(f"**Classification:** {data['classification']}")
-                
-                # Logic for product suggestion
-                if "Hard" in data['classification']:
-                    st.warning("We recommend a **Scale Inhibitor Filter** for your area.")
-                else:
-                    st.info("A **Standard Carbon Filter** is suitable for your area.")
-            else:
-                st.error("Data not found for this postcode. Please check the format.")
-    else:
-        st.warning("Please enter a valid postcode.")
+def get_water_profile(postcode):
+    """Fetches profile from DB or researches it."""
+    # 1. Try to get from database first
+    db_data = fetch_from_db(postcode)
+    if db_data:
+        return db_data, "Database"
+    
+    # 2. If not in DB, research it
+    hardness_info = research_water_hardness(postcode)
+    
+    # 3. Save to DB for next time
+    save_to_db(postcode, hardness_info)
+    return hardness_info, "Research Agent"
+
+# Logic to handle the input
+if postcode:
+    with st.spinner('Researching your water quality...'):
+        profile, source = get_water_profile(postcode)
+        st.write(f"**Source:** {source}")
+        st.write(profile)
