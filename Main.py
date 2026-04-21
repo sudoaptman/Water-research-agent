@@ -1,4 +1,4 @@
-from database import fetch_from_db, save_to_db
+from Database import fetch_from_db, save_to_db
 from researcher import research_water_hardness
 
 def get_water_profile(postcode):
