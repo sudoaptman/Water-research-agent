@@ -1,5 +1,5 @@
 import streamlit as st
-from main import get_water_profile
+from Main import get_water_profile
 
 st.set_page_config(page_title="Water Quality Checker", page_icon="💧")
 
