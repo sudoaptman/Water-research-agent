@@ -7,16 +7,15 @@ def get_search_agent():
 
 def research_water_hardness(postcode):
     ddgs = get_search_agent()
-    # Broaden the search by using just the first part of the postcode
-    area = postcode.split(' ')[0]
-    query = f"water hardness level in {area} UK"
+    # Broaden query to town/area to ensure we get results
+    query = f"water hardness level in {postcode} UK"
     
     try:
-        results = list(ddgs.text(query, max_results=3))
+        # Use simple text search
+        results = ddgs.text(query, max_results=3)
         if results:
-            # Join the snippets of the top 3 results
+            # Combine snippets into a single readable string
             return "\n\n".join([r['body'] for r in results])
-        else:
-            return "No information found for this area. Please try a major town nearby."
+        return "No data found for this location."
     except Exception as e:
-        return f"Research error: {str(e)}"
+        return f"Research error: {e}"
