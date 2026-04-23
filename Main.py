@@ -22,11 +22,10 @@ if st.button("Check Water Quality"):
                 # 2. Try Research
                 info = research_water_hardness(postcode)
                 
-                # Ensure we don't display 'None'
-                if info and info != "None":
+                # Check if info is actually valid text
+                if info and "No information found" not in info and "Research error" not in info:
                     st.info("Found data via Research Agent:")
                     st.write(info)
-                    # 3. Save to DB for next time
                     save_to_db(postcode, info)
                 else:
-                    st.error("No specific data found for this postcode.")
+                    st.error(info) # Display the friendly message returned by Research.py
