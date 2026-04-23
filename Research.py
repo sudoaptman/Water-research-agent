@@ -3,19 +3,24 @@ from duckduckgo_search import DDGS
 
 @st.cache_resource
 def get_search_agent():
+    # Many cloud environments require this to be instantiated cleanly
     return DDGS()
 
 def research_water_hardness(postcode):
-    ddgs = get_search_agent()
-    # Broaden query to town/area to ensure we get results
-    query = f"water hardness level in {postcode} UK"
-    
     try:
-        # Use simple text search
-        results = ddgs.text(query, max_results=3)
+        ddgs = get_search_agent()
+        # Clean the input
+        clean_query = f"water hardness in {postcode.split(' ')[0]} UK"
+        
+        # Use the context manager method which is more stable
+        with DDGS() as ddgs:
+            results = list(ddgs.text(clean_query, max_results=3))
+            
         if results:
-            # Combine snippets into a single readable string
-            return "\n\n".join([r['body'] for r in results])
-        return "No data found for this location."
+            return "\n\n".join([f"{r.get('title', '')}: {r.get('body', '')}" for r in results])
+        else:
+            return "Search engine returned zero results. Please try a different area."
+            
     except Exception as e:
-        return f"Research error: {e}"
+        # This will return the actual error to your screen so we can see it
+        return f"CRITICAL SEARCH ERROR: {str(e)}"
