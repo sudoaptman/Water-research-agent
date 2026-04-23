@@ -11,21 +11,19 @@ if st.button("Check Water Quality"):
     if not postcode:
         st.warning("Please enter a postcode.")
     else:
-        with st.spinner('Researching local data...'):
-            # 1. Try DB
+        with st.spinner('Researching...'):
+            # Try Database
             db_data = fetch_from_db(postcode)
             
             if db_data:
-                st.success("Data found in database!")
+                st.write("**Source:** Database")
                 st.write(db_data)
             else:
-                # 2. Try Research
+                # Try Research Agent
                 info = research_water_hardness(postcode)
+                st.write("**Source:** Research Agent")
+                st.write(info)
                 
-                # Check if info is actually valid text
-                if info and "No information found" not in info and "Research error" not in info:
-                    st.info("Found data via Research Agent:")
-                    st.write(info)
+                # Only save to DB if it's actual data, not an error message
+                if "Research error" not in info and "No data found" not in info:
                     save_to_db(postcode, info)
-                else:
-                    st.error(info) # Display the friendly message returned by Research.py
