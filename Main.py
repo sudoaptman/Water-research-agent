@@ -7,7 +7,6 @@ st.title("💧 UK Water Quality Checker")
 
 postcode = st.text_input("Enter your UK Postcode (e.g., PO1 1AA):", key="pc_input")
 
-# Use a button to prevent auto-triggering
 if st.button("Check Water Quality"):
     if not postcode:
         st.warning("Please enter a postcode.")
@@ -23,10 +22,11 @@ if st.button("Check Water Quality"):
                 # 2. Try Research
                 info = research_water_hardness(postcode)
                 
-                if info:
+                # Ensure we don't display 'None'
+                if info and info != "None":
                     st.info("Found data via Research Agent:")
                     st.write(info)
-                    # 3. Save to DB
+                    # 3. Save to DB for next time
                     save_to_db(postcode, info)
                 else:
-                    st.error("No specific data found for this postcode. Please check the spelling or try a nearby area.")
+                    st.error("No specific data found for this postcode.")
